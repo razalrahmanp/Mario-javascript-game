@@ -90,101 +90,163 @@
 /*!**************************!*\
   !*** ./src/js/canvas.js ***!
   \**************************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/*! no static exports found */
+/***/ (function(module, exports) {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_utils__WEBPACK_IMPORTED_MODULE_0__);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-
 var canvas = document.querySelector('canvas');
 var c = canvas.getContext('2d');
 canvas.width = innerWidth;
 canvas.height = innerHeight;
-var mouse = {
-  x: innerWidth / 2,
-  y: innerHeight / 2
-};
-var colors = ['#2185C5', '#7ECEFD', '#FFF6E5', '#FF7F66']; // Event Listeners
+var gravity = 1; //Object
 
-addEventListener('mousemove', function (event) {
-  mouse.x = event.clientX;
-  mouse.y = event.clientY;
-});
-addEventListener('resize', function () {
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
-  init();
-}); // Objects
+var Player = /*#__PURE__*/function () {
+  function Player() {
+    _classCallCheck(this, Player);
 
-var _Object = /*#__PURE__*/function () {
-  function Object(x, y, radius, color) {
-    _classCallCheck(this, Object);
-
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.color = color;
+    this.position = {
+      x: Math.random() * innerWidth,
+      y: Math.random() * innerHeight
+    };
+    this.velocity = {
+      x: 0,
+      y: 1
+    };
+    this.width = 30;
+    this.height = 30;
   }
 
-  _createClass(Object, [{
+  _createClass(Player, [{
     key: "draw",
     value: function draw() {
-      c.beginPath();
-      c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-      c.fillStyle = this.color;
-      c.fill();
-      c.closePath();
+      c.fillStyle = 'blue';
+      c.fillRect(this.position.x, this.position.y, this.width, this.height);
     }
   }, {
     key: "update",
     value: function update() {
       this.draw();
+      this.position.x += this.velocity.x;
+      this.position.y += this.velocity.y;
+      if (this.position.y + this.height + this.velocity.y <= canvas.height) this.velocity.y += gravity;else this.velocity.y = 0;
     }
   }]);
 
-  return Object;
-}(); // Implementation
+  return Player;
+}(); //Platform
 
 
-var objects;
+var Platform = /*#__PURE__*/function () {
+  function Platform() {
+    _classCallCheck(this, Platform);
 
-function init() {
-  objects = [];
-
-  for (var i = 0; i < 400; i++) {// objects.push()
+    this.position = {
+      x: 0,
+      y: 0
+    };
+    this.width = 200;
+    this.height = 100;
   }
-} // Animation Loop
 
+  _createClass(Platform, [{
+    key: "draw",
+    value: function draw() {
+      c.fillRect(this.position.x, this.position.y, this.width, this.height);
+    }
+  }, {
+    key: "update",
+    value: function update() {}
+  }]);
+
+  return Platform;
+}(); //Objects
+
+
+var player = new Player();
+var platform = new Platform();
+var keys = {
+  right: {
+    pressed: false
+  },
+  left: {
+    pressed: false
+  }
+}; // Animation
 
 function animate() {
   requestAnimationFrame(animate);
   c.clearRect(0, 0, canvas.width, canvas.height);
-  c.fillText('HTML CANVAS BOILERPLATE', mouse.x, mouse.y); // objects.forEach(object => {
-  //  object.update()
-  // })
+  player.update();
+  platform.draw();
+
+  if (keys.right.pressed) {
+    player.velocity.x = 5;
+  } else if (keys.left.pressed) {
+    player.velocity.x = -5;
+  } else player.velocity.x = 0;
 }
 
-init();
-animate();
+animate(); // Key Controlls From Keyboard
 
-/***/ }),
+addEventListener('keydown', function (_ref) {
+  var keyCode = _ref.keyCode;
+  console.log(keyCode);
 
-/***/ "./src/js/utils.js":
-/*!*************************!*\
-  !*** ./src/js/utils.js ***!
-  \*************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+  switch (keyCode) {
+    case (65, 37):
+      console.log("left");
+      keys.left.pressed = true;
+      break;
 
-throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nError: ENOENT: no such file or directory, open 'G:\\Razal\\WEB\\Game\\mario\\src\\js\\utils.js'");
+    case (83, 40):
+      console.log("down");
+      break;
+
+    case (68, 39):
+      console.log("right");
+      keys.right.pressed = true;
+      break;
+
+    case (87, 38):
+      console.log("up");
+      player.velocity.y -= 20;
+      break;
+  }
+
+  console.log(keys.right.pressed);
+});
+addEventListener('keyup', function (_ref2) {
+  var keyCode = _ref2.keyCode;
+  console.log(keyCode);
+
+  switch (keyCode) {
+    case (65, 37):
+      console.log("left");
+      keys.left.pressed = false;
+      break;
+
+    case (83, 40):
+      console.log("down");
+      break;
+
+    case (68, 39):
+      console.log("right");
+      keys.right.pressed = false;
+      break;
+
+    case (87, 38):
+      console.log("up");
+      player.velocity.y -= 20;
+      break;
+  }
+
+  console.log(keys.right.pressed);
+});
 
 /***/ })
 
